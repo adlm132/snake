@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Juego de la Serpiente</title>
+    <style>
+        body {
+            background-color: #222;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        #game-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #game-board {
+            position: relative;
+            margin: 0 auto;
+            border: 4px solid #fff; /* Borde más marcado */
+            background-image: url("image/un-gran-pulpo-en-el-fondo-marino-entre-las-ruinas.jpg");
+            background-size: cover;
+            background-position: center;
+            width: 570px; /* Aumenta el tamaño del cuadro de juego */
+            height: 570px; /* Aumenta el tamaño del cuadro de juego */
+        }
+
+        #game-info {
+            text-align: left; /* Alineación a la izquierda */
+            margin-left: 20px; /* Margen izquierdo */
+        }
+
+        #logout-button {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="game-board">
+            <canvas id="canvas" width="400" height="400"></canvas>
+        </div>
+        <div id="game-info">
+            <h1>Juego de la Serpiente</h1>
+            <p>Score: <span id="score">0</span></p>
+            <p id="score-result"></p>
+            <button onclick="startGame()">Start</button>
+            <button onclick="pauseGame()">Pausa</button>
+            <button onclick="setGameSpeed('slow')">Lento</button>
+            <button onclick="setGameSpeed('normal')">Normal</button>
+            <button onclick="setGameSpeed('fast')">Rápido</button>
+            <button onclick="toggleAudio()">Toggle Audio</button>
+            <button id="logout-button" onclick="logout()">Cerrar sesión</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script>
+        // Configuración del juego
+        var canvas = document.getElementById("canvas");
+        var context = canvas.getContext("2d");
+        var canvasSize = canvas.width;
+        var blockSize = 20;
+        var gameSpeed = 200;
+
+        var snake = {
+            body: [],
+            direction: "right"
+        };
+
+        var food = {
+            x: 0,
+            y: 0
+        };
+
+        var score = 0;
+        var gameInterval;
+        var isPaused = false;
+
+        // Reproducir música de fondo
+        var backgroundMusic = new Audio("music/movements  Pham feat Yung Fusion  españo.mp3");
+        backgroundMusic.loop = true;
+
+        function startGame() {
+            snake.body = [
+                { x: 5, y: 5 },
+                { x: 4, y: 5 },
+                { x: 3, y: 5 }
+            ];
+            snake.direction = "right";
+            score = 0;
+            document.getElementById("score").textContent = score;
+            document.getElementById("score-result").textContent = "";
+
+            generateFood();
+
+            if (gameInterval) {
+                clearInterval(gameInterval);
+            }
+
+            gameInterval = setInterval(gameLoop, gameSpeed);
+
+            backgroundMusic.play();
+        }
+
+        function gameLoop() {
+            if (!isPaused) {
+                clearCanvas();
+                moveSnake();
+                drawSnake();
+                drawFood();
+
+                if (checkCollision()) {
+                    endGame();
+                }
+            }
+        }
+
+        function clearCanvas() {
+            context.clearRect(0, 0, canvasSize, canvasSize);
+        }
+
+        function moveSnake() {
+            var head = Object.assign({}, snake.body[0]);
+
+            if (snake.direction === "right") {
+                head.x++;
+            } else if (snake.direction === "left") {
+                head.x--;
+            } else if (snake.direction === "up") {
+                head.y--;
+            } else if (snake.direction === "down") {
+                head.y++;
+            }
+
+            snake.body.unshift(head);
+
+            if (head.x === food.x && head.y === food.y) {
+                generateFood();
+                score++;
+                document.getElementById("score").textContent = score;
+            } else {
+                snake.body.pop();
+            }
+        }
+
+        function drawSnake() {
+            snake.body.forEach(function (block) {
+                context.fillStyle = "#000";
+                context.fillRect(block.x * blockSize, block.y * blockSize, blockSize, blockSize);
+            });
+        }
+
+        function drawFood() {
+            context.fillStyle = "#f00";
+            context.fillRect(food.x * blockSize, food.y * blockSize, blockSize, blockSize);
+        }
+
+        function generateFood() {
+            food.x = Math.floor(Math.random() * (canvasSize / blockSize));
+            food.y = Math.floor(Math.random() * (canvasSize / blockSize));
+        }
+
+        function checkCollision() {
+            var head = snake.body[0];
+
+            if (
+                head.x < 0 ||
+                head.x >= canvasSize / blockSize ||
+                head.y < 0 ||
+                head.y >= canvasSize / blockSize
+            ) {
+                return true;
+            }
+
+            for (var i = 1; i < snake.body.length; i++) {
+                if (head.x === snake.body[i].x && head.y === snake.body[i].y) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        function endGame() {
+            clearInterval(gameInterval);
+            backgroundMusic.pause();
+            sendScoreToServer(score); // Enviar el puntaje al servidor antes de mostrar el mensaje
+            document.getElementById("score-result").textContent = "Resultado guardado en la base de datos: " + score;
+        }
+
+        function setGameSpeed(speed) {
+            if (speed === "slow") {
+                gameSpeed = 400;
+            } else if (speed === "normal") {
+                gameSpeed = 200;
+            } else if (speed === "fast") {
+                gameSpeed = 100;
+            }
+
+            if (gameInterval) {
+                clearInterval(gameInterval);
+                gameInterval = setInterval(gameLoop, gameSpeed);
+            }
+        }
+
+        function pauseGame() {
+            isPaused = !isPaused;
+        }
+
+        function toggleAudio() {
+            if (backgroundMusic.paused) {
+                backgroundMusic.play();
+            } else {
+                backgroundMusic.pause();
+            }
+        }
+
+        function sendScoreToServer(score) {
+            $.ajax({
+                url: "save_score.php",
+                type: "POST",
+                data: { score: score },
+                contentType: "application/x-www-form-urlencoded", // Agregar esta línea
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error en la solicitud AJAX:", error);
+                }
+            });
+        }
+
+        function logout() {
+            window.location.href = "index.html";
+        }
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "ArrowUp" && snake.direction !== "down") {
+                snake.direction = "up";
+            } else if (event.key === "ArrowDown" && snake.direction !== "up") {
+                snake.direction = "down";
+            } else if (event.key === "ArrowLeft" && snake.direction !== "right") {
+                snake.direction = "left";
+            } else if (event.key === "ArrowRight" && snake.direction !== "left") {
+                snake.direction = "right";
+            }
+        });
+    </script>
+</body>
+</html>
+
+

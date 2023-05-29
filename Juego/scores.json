@@ -1,0 +1,9 @@
+[
+{"type":"header","version":"5.1.1","comment":"Export to JSON plugin for PHPMyAdmin"},
+{"type":"database","name":"game_scores"},
+{"type":"table","name":"scores","database":"game_scores","data":
+[
+{"id":"1","score":"20"}
+]
+}
+]

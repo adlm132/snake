@@ -1,0 +1,14 @@
+[
+{"type":"header","version":"5.1.1","comment":"Export to JSON plugin for PHPMyAdmin"},
+{"type":"database","name":"usuario"},
+{"type":"table","name":"usuarios","database":"usuario","data":
+[
+{"ID":"1","nombre_usuario":"admin","contrasena":"123"},
+{"ID":"2","nombre_usuario":"andres","contrasena":"154"},
+{"ID":"3","nombre_usuario":"juan","contrasena":"2525"},
+{"ID":"4","nombre_usuario":"usuario","contrasena":"1213"},
+{"ID":"5","nombre_usuario":"jose","contrasena":"4445"},
+{"ID":"6","nombre_usuario":"raul","contrasena":"3434"}
+]
+}
+]

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Iniciar sesión</title>
+    <style>
+        body {
+            background-color: #222;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-form {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .login-form input {
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+
+        .login-form button {
+            padding: 10px 20px;
+            background-color: #f00;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-form">
+            <h2>Iniciar sesión</h2>
+            <input type="text" id="username" placeholder="Nombre de usuario" />
+            <input type="password" id="password" placeholder="Contraseña" />
+            <button onclick="login()">Iniciar sesión</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script>
+        function login() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
+            var users = [
+                { username: "admin", password: "23" },
+                { username: "andres", password: "154" },
+                { username: "juan", password: "2525" },
+                { username: "usuario", password: "1213" },
+                { username: "jose", password: "4445" },
+                { username: "raul", password: "3434" }
+            ];
+
+            var isValidUser = false;
+
+            for (var i = 0; i < users.length; i++) {
+                if (username === users[i].username && password === users[i].password) {
+                    isValidUser = true;
+                    break;
+                }
+            }
+
+            if (isValidUser) {
+                // Redirigir al juego
+                window.location.href = "Snake.html";
+            } else {
+                alert("Nombre de usuario o contraseña incorrectos. Inténtalo de nuevo.");
+            }
+        }
+    </script>
+</body>
+</html>
